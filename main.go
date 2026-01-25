@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	_ "embed"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +16,9 @@ import (
 	"mvdan.cc/sh/v3/syntax"
 )
 
+//go:embed hack/ca-certificates.crt
+var caCerts []byte
+
 func main() {
 	if len(os.Args) < 2 || os.Args[1] == "--help" || os.Args[1] == "-h" {
 		fmt.Println("usage: RUN <url> [args...]")
@@ -21,7 +27,13 @@ func main() {
 
 	url := os.Args[1]
 
-	resp, err := http.Get(url)
+	client, err := newHTTPClient()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to create HTTP client: %v\n", err)
+		os.Exit(1)
+	}
+
+	resp, err := client.Get(url)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to fetch script: %v\n", err)
 		os.Exit(1)
@@ -43,6 +55,21 @@ func main() {
 		fmt.Fprintf(os.Stderr, "script error: %v\n", err)
 		os.Exit(1)
 	}
+}
+
+func newHTTPClient() (*http.Client, error) {
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(caCerts) {
+		return nil, fmt.Errorf("failed to parse embedded CA certificates")
+	}
+
+	return &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: certPool,
+			},
+		},
+	}, nil
 }
 
 func runScript(script string, args []string) error {

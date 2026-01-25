@@ -3,10 +3,11 @@ WORKDIR /build
 COPY go.mod go.sum ./
 RUN go mod download
 COPY main.go ./
-RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o run .
+COPY hack/ca-certificates.crt ./hack/
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o run . && \
+    apk add --no-cache upx && upx --best --lzma run
 
 FROM scratch
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /build/run /usr/local/bin/RUN
 ENTRYPOINT ["RUN"]
 CMD ["--help"]
