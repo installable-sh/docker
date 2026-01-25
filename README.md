@@ -1,27 +1,28 @@
 # RUN
 
-A minimal Docker image that fetches and executes shell scripts from URLs without requiring a shell interpreter to be installed. Uses [mvdan/sh](https://github.com/mvdan/sh), a POSIX shell interpreter written in pure Go.
+A minimal Docker image that fetches and executes shell scripts from URLs. Uses [mvdan/sh](https://github.com/mvdan/sh), a POSIX shell interpreter written in pure Go.
 
 ## Usage
 
 ```dockerfile
-FROM ghcr.io/scaffoldly/run
-CMD ["https://example.com/script.sh", "arg1", "arg2"]
+FROM ghcr.io/scaffoldly/run AS run
+
+FROM ubuntu:latest
+COPY --from=run / /
+CMD ["RUN", "https://example.com/script.sh", "arg1", "arg2"]
 ```
 
-Or run directly:
+The `COPY --from=run / /` pattern adds the `RUN` binary to any base image, allowing scripts to use the base image's utilities.
 
-```bash
-docker run ghcr.io/scaffoldly/run https://example.com/script.sh arg1 arg2
-```
+See the [examples](./examples) directory for more examples.
 
 ## Features
 
-- **Minimal footprint**: ~15MB image (Go binary + busybox + CA certificates)
+- **Minimal footprint**: ~9MB image (Go binary + CA certificates)
 - **No shell required**: The POSIX shell interpreter is embedded in the Go binary
 - **Argument passing**: Pass arguments to scripts via `$1`, `$2`, etc.
 - **HTTPS support**: Includes CA certificates for fetching scripts over HTTPS
-- **Common utilities**: Includes busybox for `sleep`, `echo`, `cat`, `grep`, etc.
+- **Compatible**: Overlay onto any base image with `COPY --from=run / /`
 
 ## Building
 
@@ -32,7 +33,7 @@ docker build -t run .
 ## Limitations
 
 - Scripts must be POSIX-compliant (no bash-specific features like arrays, `[[`, `set -E`, etc.)
-- External commands must exist in the image (busybox provides common ones)
+- External commands must exist in the base image
 
 ## License
 
