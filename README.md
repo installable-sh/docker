@@ -18,12 +18,27 @@ Also available at `ghcr.io/scaffoldly/run`.
 
 See the [examples](./examples) directory for more examples.
 
+## Environment Variables as Headers
+
+Use `+env` to send environment variables as HTTP headers when fetching scripts:
+
+```dockerfile
+CMD ["RUN", "+env", "https://example.com/script.sh"]
+```
+
+Each environment variable is sent as an `X-Env-*` header:
+- `API_KEY=secret` → `X-Env-API_KEY: secret`
+- `FOO=bar` → `X-Env-FOO: bar`
+
+This allows dynamic script generation based on the container's environment.
+
 ## Features
 
-- **Minimal footprint**: ~9MB image (Go binary + CA certificates)
+- **Minimal footprint**: ~4MB image (compressed Go binary with embedded CA certificates)
 - **No shell required**: The POSIX shell interpreter is embedded in the Go binary
 - **Argument passing**: Pass arguments to scripts via `$1`, `$2`, etc.
-- **HTTPS support**: Includes CA certificates for fetching scripts over HTTPS
+- **HTTPS support**: CA certificates embedded in the binary
+- **Environment forwarding**: Send env vars as HTTP headers with `+env`
 - **Compatible**: Overlay onto any base image with `COPY --from=run / /`
 
 ## Building
