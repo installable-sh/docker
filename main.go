@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"mvdan.cc/sh/v3/expand"
 	"mvdan.cc/sh/v3/interp"
 	"mvdan.cc/sh/v3/syntax"
@@ -59,8 +60,8 @@ func main() {
 	}
 }
 
-func fetchScript(client *http.Client, url string, sendEnv bool) (string, error) {
-	req, err := http.NewRequest("GET", url, nil)
+func fetchScript(client *retryablehttp.Client, url string, sendEnv bool) (string, error) {
+	req, err := retryablehttp.NewRequest("GET", url, nil)
 	if err != nil {
 		return "", err
 	}
@@ -92,19 +93,21 @@ func fetchScript(client *http.Client, url string, sendEnv bool) (string, error) 
 	return string(script), nil
 }
 
-func newHTTPClient() (*http.Client, error) {
+func newHTTPClient() (*retryablehttp.Client, error) {
 	certPool := x509.NewCertPool()
 	if !certPool.AppendCertsFromPEM(caCerts) {
 		return nil, fmt.Errorf("failed to parse embedded CA certificates")
 	}
 
-	return &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs: certPool,
-			},
+	client := retryablehttp.NewClient()
+	client.RetryMax = 0 // Unlimited retries
+	client.HTTPClient.Transport = &http.Transport{
+		TLSClientConfig: &tls.Config{
+			RootCAs: certPool,
 		},
-	}, nil
+	}
+
+	return client, nil
 }
 
 func runScript(script string, args []string) error {
