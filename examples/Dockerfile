@@ -1,4 +1,4 @@
-FROM ghcr.io/scaffoldly/run AS run
+FROM scaffoldly/run AS run
 
 FROM ubuntu:latest
 COPY --from=run / /

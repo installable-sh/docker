@@ -5,7 +5,7 @@ A minimal Docker image that fetches and executes shell scripts from URLs. Uses [
 ## Usage
 
 ```dockerfile
-FROM ghcr.io/scaffoldly/run AS run
+FROM scaffoldly/run AS run
 
 FROM ubuntu:latest
 COPY --from=run / /
@@ -13,6 +13,8 @@ CMD ["RUN", "https://example.com/script.sh", "arg1", "arg2"]
 ```
 
 The `COPY --from=run / /` pattern adds the `RUN` binary to any base image, allowing scripts to use the base image's utilities.
+
+Also available at `ghcr.io/scaffoldly/run`.
 
 See the [examples](./examples) directory for more examples.
 
