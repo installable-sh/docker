@@ -32,6 +32,35 @@ Each environment variable is sent as an `X-Env-*` header:
 
 This allows dynamic script generation based on the container's environment.
 
+## Custom User-Agent
+
+The default User-Agent is `run/1.0 (scaffoldly)`. Set the `USER_AGENT` environment variable to override it:
+
+```dockerfile
+ENV USER_AGENT="MyApp/1.0"
+CMD ["RUN", "https://example.com/script.sh"]
+```
+
+## Raw Output
+
+Use `+raw` to print the fetched script without executing it:
+
+```bash
+RUN +raw https://example.com/script.sh
+```
+
+This is useful for debugging or piping the script to another tool.
+
+## Bypass CDN Cache
+
+Use `+nocache` to request fresh content from the origin server:
+
+```bash
+RUN +nocache https://example.com/script.sh
+```
+
+This sets `Cache-Control: no-cache, no-store, must-revalidate` and `Pragma: no-cache` headers.
+
 ## Features
 
 - **Minimal footprint**: ~4MB image (compressed Go binary with embedded CA certificates)
@@ -39,6 +68,9 @@ This allows dynamic script generation based on the container's environment.
 - **Argument passing**: Pass arguments to scripts via `$1`, `$2`, etc.
 - **HTTPS support**: CA certificates embedded in the binary
 - **Environment forwarding**: Send env vars as HTTP headers with `+env`
+- **Custom User-Agent**: Set `USER_AGENT` env var to customize the request header
+- **Raw output**: Use `+raw` to print the script without executing
+- **Cache bypass**: Use `+nocache` to skip CDN caches
 - **Compatible**: Overlay onto any base image with `COPY --from=run / /`
 
 ## Building
