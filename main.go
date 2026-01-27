@@ -109,6 +109,20 @@ func main() {
 	}
 }
 
+func isValidHeaderName(name string) bool {
+	if name == "" {
+		return false
+	}
+	for _, c := range name {
+		// HTTP header names must be tokens (RFC 7230)
+		// Allow: A-Z a-z 0-9 ! # $ % & ' * + - . ^ _ ` | ~
+		if c <= ' ' || c >= 127 || strings.ContainsRune("\"(),/:;<=>?@[\\]{}", c) {
+			return false
+		}
+	}
+	return true
+}
+
 func fetchScript(client *retryablehttp.Client, args parsedArgs) (fetchedScript, error) {
 	req, err := retryablehttp.NewRequest("GET", args.url, nil)
 	if err != nil {
@@ -132,7 +146,7 @@ func fetchScript(client *retryablehttp.Client, args parsedArgs) (fetchedScript, 
 	if args.sendEnv {
 		for _, env := range os.Environ() {
 			parts := strings.SplitN(env, "=", 2)
-			if len(parts) == 2 {
+			if len(parts) == 2 && isValidHeaderName(parts[0]) {
 				req.Header.Set("X-Env-"+parts[0], parts[1])
 			}
 		}
