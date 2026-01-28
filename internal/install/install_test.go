@@ -2,6 +2,7 @@ package install
 
 import (
 	"bytes"
+	"context"
 	"strings"
 	"testing"
 )
@@ -61,7 +62,7 @@ func TestExec_Help(t *testing.T) {
 		Stderr:   &bytes.Buffer{},
 	}
 
-	err := cmd.Exec()
+	err := cmd.Exec(context.Background())
 	if err != nil {
 		t.Errorf("Exec() error = %v", err)
 	}
@@ -79,7 +80,7 @@ func TestExec_Version(t *testing.T) {
 		Stderr:      &bytes.Buffer{},
 	}
 
-	err := cmd.Exec()
+	err := cmd.Exec(context.Background())
 	if err != nil {
 		t.Errorf("Exec() error = %v", err)
 	}
@@ -92,7 +93,7 @@ func TestExec_NotImplemented(t *testing.T) {
 		Stderr: &stderr,
 	}
 
-	err := cmd.Exec()
+	err := cmd.Exec(context.Background())
 	if err == nil {
 		t.Error("Exec() expected error for not implemented")
 	}

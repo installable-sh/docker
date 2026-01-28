@@ -19,12 +19,13 @@ type Script struct {
 }
 
 // Run executes a shell script with the given arguments.
-func Run(script Script, args []string) error {
-	return RunWithIO(script, args, os.Stdin, os.Stdout, os.Stderr)
+func Run(ctx context.Context, script Script, args []string) error {
+	return RunWithIO(ctx, script, args, os.Stdin, os.Stdout, os.Stderr)
 }
 
 // RunWithIO executes a shell script with custom I/O streams.
-func RunWithIO(script Script, args []string, stdin io.Reader, stdout, stderr io.Writer) error {
+func RunWithIO(ctx context.Context, script Script, args []string, stdin io.Reader, stdout, stderr io.Writer) error {
+
 	parser := syntax.NewParser()
 	prog, err := parser.Parse(strings.NewReader(script.Content), script.Name)
 	if err != nil {
@@ -40,5 +41,5 @@ func RunWithIO(script Script, args []string, stdin io.Reader, stdout, stderr io.
 		return fmt.Errorf("interpreter error: %w", err)
 	}
 
-	return runner.Run(context.Background(), prog)
+	return runner.Run(ctx, prog)
 }

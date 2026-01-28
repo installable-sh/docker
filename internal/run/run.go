@@ -1,6 +1,7 @@
 package run
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -72,7 +73,7 @@ func New(args []string) *Run {
 }
 
 // Exec executes the RUN command.
-func (r *Run) Exec() error {
+func (r *Run) Exec(ctx context.Context) error {
 	if r.ShowVersion {
 		version.Print("RUN")
 		return nil
@@ -91,7 +92,7 @@ func (r *Run) Exec() error {
 		return fmt.Errorf("failed to create HTTP client: %w", err)
 	}
 
-	script, err := fetch.Fetch(client, fetch.Options{
+	script, err := fetch.Fetch(ctx, client, fetch.Options{
 		URL:     r.URL,
 		SendEnv: r.SendEnv,
 		NoCache: r.NoCache,
@@ -106,6 +107,7 @@ func (r *Run) Exec() error {
 	}
 
 	return shell.RunWithIO(
+		ctx,
 		shell.Script{Content: script.Content, Name: script.Name},
 		r.ScriptArgs,
 		r.Stdin,

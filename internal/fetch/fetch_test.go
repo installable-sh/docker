@@ -2,6 +2,7 @@ package fetch
 
 import (
 	"compress/gzip"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -100,7 +101,7 @@ func TestFetch(t *testing.T) {
 				t.Fatalf("NewClient() error: %v", err)
 			}
 
-			script, err := Fetch(client, tt.opts)
+			script, err := Fetch(context.Background(), client, tt.opts)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Fetch() error = %v, wantErr %v", err, tt.wantErr)
 				return

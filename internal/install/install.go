@@ -1,6 +1,7 @@
 package install
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -40,7 +41,7 @@ func New(args []string) *Install {
 }
 
 // Exec executes the INSTALL command.
-func (i *Install) Exec() error {
+func (i *Install) Exec(_ context.Context) error {
 	if i.ShowVersion {
 		version.Print("INSTALL")
 		return nil

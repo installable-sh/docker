@@ -3,6 +3,7 @@ package fetch
 import (
 	"compress/flate"
 	"compress/gzip"
+	"context"
 	"crypto/tls"
 	"fmt"
 	"io"
@@ -49,8 +50,8 @@ func NewClient() (*retryablehttp.Client, error) {
 }
 
 // Fetch retrieves a script from a URL.
-func Fetch(client *retryablehttp.Client, opts Options) (Script, error) {
-	req, err := retryablehttp.NewRequest("GET", opts.URL, nil)
+func Fetch(ctx context.Context, client *retryablehttp.Client, opts Options) (Script, error) {
+	req, err := retryablehttp.NewRequestWithContext(ctx, "GET", opts.URL, nil)
 	if err != nil {
 		return Script{}, err
 	}
