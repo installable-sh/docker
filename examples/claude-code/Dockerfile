@@ -1,5 +1,5 @@
 # Import the installable/sh image
-FROM installable/sh AS installable AS run
+FROM installable/sh AS installable
 
 # Install Claude Code using the RUN binary
 FROM ubuntu:latest AS claude

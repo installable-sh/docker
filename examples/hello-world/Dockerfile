@@ -1,5 +1,5 @@
 # Import the RUN image
-FROM installable/sh AS installable AS run
+FROM installable/sh AS installable
 
 # Use any base image with the utilities your script needs
 FROM ubuntu:latest
