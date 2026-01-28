@@ -48,7 +48,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Check formatting and lint
-        run: make setup check lint
+        run: make check lint
 
   build:
     needs: [test, lint]

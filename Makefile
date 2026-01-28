@@ -14,7 +14,7 @@ INSTALL:
 	@echo "==> Building INSTALL..."
 	@CGO_ENABLED=$(CGO_ENABLED) go build $(GOFLAGS) -ldflags="$(LDFLAGS)" -o INSTALL ./cmd/install
 
-test:
+test: setup
 	@echo "==> Running tests..."
 	@go test ./internal/...
 
@@ -22,7 +22,7 @@ fmt:
 	@echo "==> Formatting code..."
 	@gofmt -s -w .
 
-lint:
+lint: setup
 	@echo "==> Running linter..."
 	@golangci-lint run
 
