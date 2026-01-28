@@ -18,7 +18,7 @@ CMD ["RUN", "https://example.com/script.sh", "arg1", "arg2"]
 
 The `COPY --from=run / /` pattern adds the `RUN` and `INSTALL` binaries to any base image, allowing scripts to use the base image's utilities.
 
-Also available at `ghcr.io/installable/sh`.
+Published on Docker Hub as `installable/sh`.
 
 See the [examples](./examples) directory for more examples.
 
