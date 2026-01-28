@@ -129,7 +129,7 @@ func fetchScript(client *retryablehttp.Client, args parsedArgs) (fetchedScript, 
 		return fetchedScript{}, err
 	}
 
-	userAgent := "run/1.0 (scaffoldly)"
+	userAgent := "run/1.0 (installable)"
 	if ua := os.Getenv("USER_AGENT"); ua != "" {
 		userAgent = ua
 	}

@@ -1,4 +1,4 @@
-module github.com/scaffoldly/run
+module github.com/installable-sh/docker
 
 go 1.25.4
 
