@@ -16,18 +16,20 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/installable-sh/docker/internal/certs"
+	"github.com/installable-sh/docker/internal/version"
 	"mvdan.cc/sh/v3/expand"
 	"mvdan.cc/sh/v3/interp"
 	"mvdan.cc/sh/v3/syntax"
 )
 
 type parsedArgs struct {
-	showHelp   bool
-	sendEnv    bool
-	raw        bool
-	noCache    bool
-	url        string
-	scriptArgs []string
+	showHelp    bool
+	showVersion bool
+	sendEnv     bool
+	raw         bool
+	noCache     bool
+	url         string
+	scriptArgs  []string
 }
 
 type fetchedScript struct {
@@ -60,6 +62,8 @@ func parseArgs(args []string) parsedArgs {
 		switch arg {
 		case "--help", "-h":
 			result.showHelp = true
+		case "--version", "-v":
+			result.showVersion = true
 		case "+env":
 			result.sendEnv = true
 		case "+raw":
@@ -74,6 +78,11 @@ func parseArgs(args []string) parsedArgs {
 
 func main() {
 	args := parseArgs(os.Args[1:])
+
+	if args.showVersion {
+		version.Print("RUN")
+		os.Exit(0)
+	}
 
 	if args.showHelp || args.url == "" {
 		fmt.Println("usage: RUN [+env] [+raw] [+nocache] <url> [args...]")
