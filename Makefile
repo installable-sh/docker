@@ -13,7 +13,7 @@ INSTALL:
 	CGO_ENABLED=$(CGO_ENABLED) go build $(GOFLAGS) -ldflags="$(LDFLAGS)" -o INSTALL ./cmd/install
 
 test:
-	go test ./internal/...
+	go test -v ./internal/...
 
 compress:
 	upx --best --lzma RUN INSTALL || true
