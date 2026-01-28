@@ -32,10 +32,12 @@ func RunWithIO(ctx context.Context, script Script, args []string, stdin io.Reade
 		return fmt.Errorf("parse error: %w", err)
 	}
 
+	// Prepend "--" to args to prevent them from being interpreted as shell options
+	params := append([]string{"--"}, args...)
 	runner, err := interp.New(
 		interp.StdIO(stdin, stdout, stderr),
 		interp.Env(expand.ListEnviron(os.Environ()...)),
-		interp.Params(args...),
+		interp.Params(params...),
 	)
 	if err != nil {
 		return fmt.Errorf("interpreter error: %w", err)
