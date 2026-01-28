@@ -44,11 +44,11 @@ func TestPrint(t *testing.T) {
 
 	Print("TEST")
 
-	w.Close()
+	_ = w.Close()
 	os.Stdout = oldStdout
 
 	var buf bytes.Buffer
-	buf.ReadFrom(r)
+	_, _ = buf.ReadFrom(r)
 	got := buf.String()
 
 	want := "TEST version 1.2.3\n"

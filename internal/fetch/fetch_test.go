@@ -19,7 +19,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "basic fetch",
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("echo hello"))
+				_, _ = w.Write([]byte("echo hello"))
 			},
 			opts:        Options{URL: ""},
 			wantContent: "echo hello",
@@ -29,7 +29,7 @@ func TestFetch(t *testing.T) {
 			name: "with content-disposition",
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Disposition", `attachment; filename="test.sh"`)
-				w.Write([]byte("echo test"))
+				_, _ = w.Write([]byte("echo test"))
 			},
 			opts:        Options{URL: ""},
 			wantContent: "echo test",
@@ -40,8 +40,8 @@ func TestFetch(t *testing.T) {
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Encoding", "gzip")
 				gz := gzip.NewWriter(w)
-				gz.Write([]byte("echo gzipped"))
-				gz.Close()
+				_, _ = gz.Write([]byte("echo gzipped"))
+				_ = gz.Close()
 			},
 			opts:        Options{URL: ""},
 			wantContent: "echo gzipped",
@@ -66,7 +66,7 @@ func TestFetch(t *testing.T) {
 					w.WriteHeader(http.StatusBadRequest)
 					return
 				}
-				w.Write([]byte("echo nocache"))
+				_, _ = w.Write([]byte("echo nocache"))
 			},
 			opts:        Options{URL: "", NoCache: true},
 			wantContent: "echo nocache",
@@ -75,7 +75,7 @@ func TestFetch(t *testing.T) {
 		{
 			name: "script name from URL path",
 			handler: func(w http.ResponseWriter, r *http.Request) {
-				w.Write([]byte("echo path"))
+				_, _ = w.Write([]byte("echo path"))
 			},
 			opts:        Options{URL: ""}, // Will be set to server URL + /myscript.sh
 			wantContent: "echo path",

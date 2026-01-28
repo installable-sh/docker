@@ -47,13 +47,8 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Check formatting
-        run: make check
-
-      - name: Run linter
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
+      - name: Check formatting and lint
+        run: make setup check lint
 
   build:
     needs: [test, lint]

@@ -1,10 +1,10 @@
-.PHONY: all test clean compress fmt lint check setup-hooks
+.PHONY: all test clean compress fmt lint check setup
 
 CGO_ENABLED ?= 0
 GOFLAGS ?= -trimpath
 LDFLAGS ?= -s -w
 
-all: setup-hooks check test RUN INSTALL
+all: setup fmt lint test RUN INSTALL
 
 RUN:
 	@echo "==> Building RUN..."
@@ -39,5 +39,7 @@ clean:
 	@rm -f RUN INSTALL
 	@go clean -testcache
 
-setup-hooks:
+setup:
+	@echo "==> Setting up development environment..."
 	@[ -f scripts/pre-commit ] && [ -d .git/hooks ] && ln -sf ../../scripts/pre-commit .git/hooks/pre-commit || true
+	@command -v golangci-lint >/dev/null || (echo "Installing golangci-lint..." && go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest)

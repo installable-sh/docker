@@ -47,13 +47,13 @@ func (i *Install) Exec() error {
 	}
 
 	if i.ShowHelp {
-		fmt.Fprintln(i.Stdout, "usage: INSTALL [options] <url> [args...]")
-		fmt.Fprintln(i.Stdout)
-		fmt.Fprintln(i.Stdout, "INSTALL is under development and will be available in a future release.")
-		fmt.Fprintln(i.Stdout, "It is intended for installation and setup tasks during Docker image builds.")
+		_, _ = fmt.Fprintln(i.Stdout, "usage: INSTALL [options] <url> [args...]")
+		_, _ = fmt.Fprintln(i.Stdout)
+		_, _ = fmt.Fprintln(i.Stdout, "INSTALL is under development and will be available in a future release.")
+		_, _ = fmt.Fprintln(i.Stdout, "It is intended for installation and setup tasks during Docker image builds.")
 		return nil
 	}
 
-	fmt.Fprintln(i.Stderr, "INSTALL: coming soon")
+	_, _ = fmt.Fprintln(i.Stderr, "INSTALL: coming soon")
 	return fmt.Errorf("not implemented")
 }

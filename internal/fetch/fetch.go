@@ -82,7 +82,7 @@ func Fetch(client *retryablehttp.Client, opts Options) (Script, error) {
 	if err != nil {
 		return Script{}, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		return Script{}, fmt.Errorf("HTTP %d", resp.StatusCode)
@@ -135,7 +135,7 @@ func readBody(resp *http.Response) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("gzip error: %w", err)
 		}
-		defer gzReader.Close()
+		defer func() { _ = gzReader.Close() }()
 		reader = gzReader
 	case "deflate":
 		reader = flate.NewReader(resp.Body)

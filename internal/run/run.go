@@ -79,10 +79,10 @@ func (r *Run) Exec() error {
 	}
 
 	if r.ShowHelp || r.URL == "" {
-		fmt.Fprintln(r.Stdout, "usage: RUN [+env] [+raw] [+nocache] <url> [args...]")
-		fmt.Fprintln(r.Stdout, "  +env      Send environment variables as X-Env-* headers")
-		fmt.Fprintln(r.Stdout, "  +raw      Print the script without executing")
-		fmt.Fprintln(r.Stdout, "  +nocache  Bypass CDN caches")
+		_, _ = fmt.Fprintln(r.Stdout, "usage: RUN [+env] [+raw] [+nocache] <url> [args...]")
+		_, _ = fmt.Fprintln(r.Stdout, "  +env      Send environment variables as X-Env-* headers")
+		_, _ = fmt.Fprintln(r.Stdout, "  +raw      Print the script without executing")
+		_, _ = fmt.Fprintln(r.Stdout, "  +nocache  Bypass CDN caches")
 		return nil
 	}
 
@@ -101,7 +101,7 @@ func (r *Run) Exec() error {
 	}
 
 	if r.Raw {
-		fmt.Fprint(r.Stdout, script.Content)
+		_, _ = fmt.Fprint(r.Stdout, script.Content)
 		return nil
 	}
 
