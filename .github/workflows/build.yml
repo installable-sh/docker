@@ -16,13 +16,50 @@ concurrency:
 
 env:
   IMAGE_NAME: installable/sh
+  # All supported platforms
+  ALL_PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/386,linux/ppc64le,linux/s390x,linux/riscv64
+  # Minimal set for PRs
+  PR_PLATFORMS: linux/amd64
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run tests
+        run: make test
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Check formatting and lint
+        run: make check lint
+
   build:
+    needs: [test, lint]
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+      id-token: write # Required for attestation
+      attestations: write # Required for attestation
 
     steps:
       - name: Checkout
@@ -51,19 +88,37 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
             type=schedule,pattern={{date 'YYYYMMDD'}}
             type=ref,event=branch
+            type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha
+          labels: |
+            org.opencontainers.image.vendor=Installable
+            org.opencontainers.image.authors=Installable <https://github.com/${{ github.repository_owner }}>
+            org.opencontainers.image.documentation=https://github.com/${{ github.repository }}#readme
 
       - name: Build and push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/386,linux/ppc64le,linux/s390x,linux/riscv64
+          platforms: ${{ github.event_name == 'pull_request' && env.PR_PLATFORMS || env.ALL_PLATFORMS }}
           pull: true
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          sbom: true
+          provenance: mode=max
+
+      - name: Update Docker Hub description
+        if: github.event_name != 'pull_request'
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ env.IMAGE_NAME }}
+          readme-filepath: ./README.md
+          short-description: ${{ github.event.repository.description }}
