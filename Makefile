@@ -1,4 +1,4 @@
-.PHONY: all test clean compress fmt lint check setup
+.PHONY: all test clean fmt lint check setup
 
 CGO_ENABLED ?= 0
 GOFLAGS ?= -trimpath
@@ -29,10 +29,6 @@ lint: setup
 check:
 	@echo "==> Checking formatting..."
 	@test -z "$$(gofmt -l .)" || (echo "Run 'make fmt' to fix formatting" && gofmt -l . && exit 1)
-
-compress:
-	@echo "==> Compressing binaries..."
-	@upx --best --lzma RUN INSTALL 2>/dev/null || true
 
 clean:
 	@echo "==> Cleaning..."

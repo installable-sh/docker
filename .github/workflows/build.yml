@@ -18,8 +18,8 @@ env:
   IMAGE_NAME: installable/sh
   # All supported platforms
   ALL_PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/386,linux/ppc64le,linux/s390x,linux/riscv64
-  # Minimal set for PRs: one with UPX support (amd64), one without (s390x)
-  PR_PLATFORMS: linux/amd64,linux/s390x
+  # Minimal set for PRs
+  PR_PLATFORMS: linux/amd64
 
 jobs:
   test:

@@ -1,13 +1,15 @@
 FROM golang:alpine AS builder
-RUN apk add --no-cache git ca-certificates make && \
-    apk add --no-cache upx || true
+RUN apk add --no-cache git ca-certificates make
 WORKDIR /build
-COPY go.mod go.sum Makefile ./
+COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go go mod download
-COPY . ./
+COPY Makefile ./
+COPY cmd/ ./cmd/
+COPY internal/ ./internal/
+COPY hack/ ./hack/
 # Copy Alpine's CA certificates to the location our code expects
 RUN cp /etc/ssl/certs/ca-certificates.crt internal/certs/ca-certificates.crt
-RUN --mount=type=cache,target=/go make all compress
+RUN --mount=type=cache,target=/go make RUN INSTALL
 
 FROM scratch AS combined
 COPY --from=builder /build/RUN /usr/local/bin/RUN
