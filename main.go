@@ -76,10 +76,19 @@ func parseArgs(args []string) parsedArgs {
 }
 
 func main() {
+	// Determine which command was invoked
+	cmdName := path.Base(os.Args[0])
+	
+	// INSTALL command is coming soon
+	if cmdName == "INSTALL" {
+		fmt.Fprintln(os.Stderr, "INSTALL: coming soon")
+		os.Exit(1)
+	}
+	
 	args := parseArgs(os.Args[1:])
 
 	if args.showHelp || args.url == "" {
-		fmt.Println("usage: RUN [+env] [+raw] [+nocache] <url> [args...]")
+		fmt.Printf("usage: %s [+env] [+raw] [+nocache] <url> [args...]\n", cmdName)
 		fmt.Println("  +env      Send environment variables as X-Env-* headers")
 		fmt.Println("  +raw      Print the script without executing")
 		fmt.Println("  +nocache  Bypass CDN caches")

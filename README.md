@@ -1,20 +1,24 @@
-# RUN
+# RUN & INSTALL
 
-A minimal Docker image that fetches and executes shell scripts from URLs. Uses [mvdan/sh](https://github.com/mvdan/sh), a POSIX shell interpreter written in pure Go.
+Minimal Docker image that fetches and executes shell scripts from URLs. Uses [mvdan/sh](https://github.com/mvdan/sh), a POSIX shell interpreter written in pure Go.
+
+Includes two commands:
+- **RUN**: Fetch and execute scripts (for runtime execution)
+- **INSTALL**: Coming soon (for installation/setup tasks)
 
 ## Usage
 
 ```dockerfile
-FROM scaffoldly/run AS run
+FROM installable/sh AS run
 
 FROM ubuntu:latest
 COPY --from=run / /
 CMD ["RUN", "https://example.com/script.sh", "arg1", "arg2"]
 ```
 
-The `COPY --from=run / /` pattern adds the `RUN` binary to any base image, allowing scripts to use the base image's utilities.
+The `COPY --from=run / /` pattern adds the `RUN` and `INSTALL` binaries to any base image, allowing scripts to use the base image's utilities.
 
-Also available at `ghcr.io/scaffoldly/run`.
+Also available at `ghcr.io/installable/sh`.
 
 See the [examples](./examples) directory for more examples.
 
@@ -34,7 +38,7 @@ This allows dynamic script generation based on the container's environment.
 
 ## Custom User-Agent
 
-The default User-Agent is `run/1.0 (scaffoldly)`. Set the `USER_AGENT` environment variable to override it:
+The default User-Agent is `run/1.0 (installable)`. Set the `USER_AGENT` environment variable to override it:
 
 ```dockerfile
 ENV USER_AGENT="MyApp/1.0"
