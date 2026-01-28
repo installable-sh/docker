@@ -80,8 +80,10 @@ This sets `Cache-Control: no-cache, no-store, must-revalidate` and `Pragma: no-c
 ## Building
 
 ```bash
-docker build -t run .
+docker build -t installable/sh .
 ```
+
+**Note**: The Dockerfile copies CA certificates from Alpine's `ca-certificates` package during the build. The certificates in `internal/certs/` and `hack/` directories are placeholders for local development only.
 
 ## Limitations
 
