@@ -15,10 +15,10 @@ COPY --from=installable / /
 
 The `COPY --from=installable / /` pattern adds the `RUN` and `INSTALL` binaries to any base image, allowing scripts to use the base image's utilities.
 
-| Command | Description | Status |
-|---------|-------------|--------|
-| [`RUN`](#run-command) | Fetch and execute scripts at runtime | Ready |
-| [`INSTALL`](#install-command) | Installation and setup tasks during builds | WIP |
+| Command                       | Description                                | Status |
+| ----------------------------- | ------------------------------------------ | ------ |
+| [`RUN`](#run-command)         | Fetch and execute scripts at runtime       | Ready  |
+| [`INSTALL`](#install-command) | Installation and setup tasks during builds | WIP    |
 
 See the [examples](./examples) directory for more examples.
 
@@ -78,7 +78,7 @@ This sets `Cache-Control: no-cache, no-store, must-revalidate` and `Pragma: no-c
 
 ### Features
 
-- **Minimal footprint**: ~4MB image (compressed Go binary with embedded CA certificates)
+- **Minimal footprint**: Small image with embedded CA certificates
 - **No shell required**: The POSIX shell interpreter is embedded in the Go binary
 - **Argument passing**: Pass arguments to scripts via `$1`, `$2`, etc.
 - **HTTPS support**: CA certificates embedded in the binary
@@ -98,13 +98,35 @@ The `INSTALL` command is under development and will be available in a future rel
 
 ---
 
-## Building
+## Development
+
+### Quick Start
+
+```bash
+make        # Setup, format, lint, test, and build
+```
+
+### Makefile Targets
+
+| Target         | Description                            |
+| -------------- | -------------------------------------- |
+| `make`         | Run all: setup, fmt, lint, test, build |
+| `make setup`   | Install git hooks and golangci-lint    |
+| `make fmt`     | Format code with gofmt                 |
+| `make lint`    | Run golangci-lint                      |
+| `make check`   | Check formatting (CI)                  |
+| `make test`    | Run tests                              |
+| `make RUN`     | Build RUN binary                       |
+| `make INSTALL` | Build INSTALL binary                   |
+| `make clean`   | Remove binaries and test cache         |
+
+### Docker Build
 
 ```bash
 docker build -t installable/sh .
 ```
 
-**Note**: The Dockerfile copies CA certificates from Alpine's `ca-certificates` package during the build. The certificates in `internal/certs/` and `hack/` directories are placeholders for local development only.
+**Note**: The Dockerfile copies CA certificates from Alpine's `ca-certificates` package during the build. The certificates in `internal/certs/` are placeholders for local development only.
 
 ## Limitations
 
