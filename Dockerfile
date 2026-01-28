@@ -10,8 +10,13 @@ RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o RUN ./cmd/run && \
     CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o INSTALL ./cmd/install && \
     (apk add --no-cache upx && upx --best --lzma RUN INSTALL || true)
 
-FROM scratch
+FROM scratch AS combined
 COPY --from=builder /build/RUN /usr/local/bin/RUN
 COPY --from=builder /build/INSTALL /usr/local/bin/INSTALL
+RUN ["/usr/local/bin/RUN", "--help"]
+RUN ["/usr/local/bin/INSTALL", "--help"]
+
+FROM scratch
+COPY --from=combined / /
 ENTRYPOINT ["RUN"]
 CMD ["--help"]

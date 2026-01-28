@@ -2,27 +2,37 @@
 
 Minimal Docker image that fetches and executes shell scripts from URLs. Uses [mvdan/sh](https://github.com/mvdan/sh), a POSIX shell interpreter written in pure Go.
 
-Includes two commands:
-- **RUN**: Fetch and execute scripts (for runtime execution)
-- **INSTALL**: Coming soon (for installation/setup tasks)
+Published on Docker Hub as `installable/sh`.
 
 ## Usage
 
 ```dockerfile
-FROM installable/sh AS run
+FROM installable/sh AS installable
 
 FROM ubuntu:latest
-COPY --from=run / /
-CMD ["RUN", "https://example.com/script.sh", "arg1", "arg2"]
+COPY --from=installable / /
 ```
 
-The `COPY --from=run / /` pattern adds the `RUN` and `INSTALL` binaries to any base image, allowing scripts to use the base image's utilities.
+The `COPY --from=installable / /` pattern adds the `RUN` and `INSTALL` binaries to any base image, allowing scripts to use the base image's utilities.
 
-Published on Docker Hub as `installable/sh`.
+| Command | Description | Status |
+|---------|-------------|--------|
+| [`RUN`](#run-command) | Fetch and execute scripts at runtime | Ready |
+| [`INSTALL`](#install-command) | Installation and setup tasks during builds | WIP |
 
 See the [examples](./examples) directory for more examples.
 
-## Environment Variables as Headers
+---
+
+## RUN Command
+
+Fetch and execute scripts at runtime.
+
+```dockerfile
+CMD ["RUN", "https://example.com/script.sh", "arg1", "arg2"]
+```
+
+### Environment Variables as Headers
 
 Use `+env` to send environment variables as HTTP headers when fetching scripts:
 
@@ -31,12 +41,13 @@ CMD ["RUN", "+env", "https://example.com/script.sh"]
 ```
 
 Each environment variable is sent as an `X-Env-*` header:
+
 - `API_KEY=secret` → `X-Env-API_KEY: secret`
 - `FOO=bar` → `X-Env-FOO: bar`
 
 This allows dynamic script generation based on the container's environment.
 
-## Custom User-Agent
+### Custom User-Agent
 
 The default User-Agent is `run/1.0 (installable)`. Set the `USER_AGENT` environment variable to override it:
 
@@ -45,7 +56,7 @@ ENV USER_AGENT="MyApp/1.0"
 CMD ["RUN", "https://example.com/script.sh"]
 ```
 
-## Raw Output
+### Raw Output
 
 Use `+raw` to print the fetched script without executing it:
 
@@ -55,7 +66,7 @@ RUN +raw https://example.com/script.sh
 
 This is useful for debugging or piping the script to another tool.
 
-## Bypass CDN Cache
+### Bypass CDN Cache
 
 Use `+nocache` to request fresh content from the origin server:
 
@@ -65,7 +76,7 @@ RUN +nocache https://example.com/script.sh
 
 This sets `Cache-Control: no-cache, no-store, must-revalidate` and `Pragma: no-cache` headers.
 
-## Features
+### Features
 
 - **Minimal footprint**: ~4MB image (compressed Go binary with embedded CA certificates)
 - **No shell required**: The POSIX shell interpreter is embedded in the Go binary
@@ -75,7 +86,17 @@ This sets `Cache-Control: no-cache, no-store, must-revalidate` and `Pragma: no-c
 - **Custom User-Agent**: Set `USER_AGENT` env var to customize the request header
 - **Raw output**: Use `+raw` to print the script without executing
 - **Cache bypass**: Use `+nocache` to skip CDN caches
-- **Compatible**: Overlay onto any base image with `COPY --from=run / /`
+- **Compatible**: Overlay onto any base image with `COPY --from=installable / /`
+
+---
+
+## INSTALL Command
+
+🚧 **Work in Progress** 🚧
+
+The `INSTALL` command is under development and will be available in a future release. It is intended for installation and setup tasks during Docker image builds.
+
+---
 
 ## Building
 
@@ -92,4 +113,6 @@ docker build -t installable/sh .
 
 ## License
 
-MIT
+Copyright 2026 Scaffoldly LLC
+
+Apache 2.0
