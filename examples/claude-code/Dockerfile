@@ -1,5 +1,5 @@
-# Import the RUN image
-FROM scaffoldly/run AS run
+# Import the installable/sh image
+FROM installable/sh AS run
 
 # Install Claude Code using the RUN binary
 FROM ubuntu:latest AS claude

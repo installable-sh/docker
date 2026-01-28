@@ -6,7 +6,6 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	_ "embed"
 	"fmt"
 	"io"
 	"mime"
@@ -16,13 +15,11 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-retryablehttp"
+	"github.com/installable-sh/docker/internal/certs"
 	"mvdan.cc/sh/v3/expand"
 	"mvdan.cc/sh/v3/interp"
 	"mvdan.cc/sh/v3/syntax"
 )
-
-//go:embed hack/ca-certificates.crt
-var caCerts []byte
 
 type parsedArgs struct {
 	showHelp   bool
@@ -129,7 +126,7 @@ func fetchScript(client *retryablehttp.Client, args parsedArgs) (fetchedScript, 
 		return fetchedScript{}, err
 	}
 
-	userAgent := "run/1.0 (scaffoldly)"
+	userAgent := "run/1.0 (installable)"
 	if ua := os.Getenv("USER_AGENT"); ua != "" {
 		userAgent = ua
 	}
@@ -200,7 +197,7 @@ func fetchScript(client *retryablehttp.Client, args parsedArgs) (fetchedScript, 
 
 func newHTTPClient() (*retryablehttp.Client, error) {
 	certPool := x509.NewCertPool()
-	if !certPool.AppendCertsFromPEM(caCerts) {
+	if !certPool.AppendCertsFromPEM(certs.CACerts) {
 		return nil, fmt.Errorf("failed to parse embedded CA certificates")
 	}
 
