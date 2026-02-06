@@ -16,7 +16,7 @@ func main() {
 
 	cmd := install.New(os.Args[1:])
 	if err := cmd.Exec(ctx); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		fmt.Fprintf(os.Stderr, "[install] error: %v\n", err)
 		os.Exit(1)
 	}
 }

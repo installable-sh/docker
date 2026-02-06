@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"syscall"
 
 	"mvdan.cc/sh/v3/expand"
 	"mvdan.cc/sh/v3/interp"
@@ -19,13 +20,13 @@ type Script struct {
 }
 
 // Run executes a shell script with the given arguments.
-func Run(ctx context.Context, script Script, args []string) error {
-	return RunWithIO(ctx, script, args, os.Stdin, os.Stdout, os.Stderr)
+func Run(ctx context.Context, script Script, args []string, sigCh <-chan os.Signal) error {
+	return RunWithIO(ctx, script, args, os.Stdin, os.Stdout, os.Stderr, sigCh)
 }
 
 // RunWithIO executes a shell script with custom I/O streams.
-func RunWithIO(ctx context.Context, script Script, args []string, stdin io.Reader, stdout, stderr io.Writer) error {
-
+// sigCh receives signals that should be forwarded to the running script.
+func RunWithIO(ctx context.Context, script Script, args []string, stdin io.Reader, stdout, stderr io.Writer, sigCh <-chan os.Signal) error {
 	parser := syntax.NewParser()
 	prog, err := parser.Parse(strings.NewReader(script.Content), script.Name)
 	if err != nil {
@@ -43,5 +44,23 @@ func RunWithIO(ctx context.Context, script Script, args []string, stdin io.Reade
 		return fmt.Errorf("interpreter error: %w", err)
 	}
 
-	return runner.Run(ctx, prog)
+	// Run the script in a goroutine so we can handle signals
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- runner.Run(ctx, prog)
+	}()
+
+	// Wait for completion or forward signals
+	for {
+		select {
+		case err := <-errCh:
+			return err
+		case sig := <-sigCh:
+			// Forward signal to the process group
+			// Using negative PID sends to all processes in the group
+			if signum, ok := sig.(syscall.Signal); ok {
+				_ = syscall.Kill(-os.Getpid(), signum)
+			}
+		}
+	}
 }
