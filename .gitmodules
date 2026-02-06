@@ -1,0 +1,9 @@
+[submodule "lib"]
+	path = lib
+	url = git@github.com:installable-sh/lib.git
+[submodule "run"]
+	path = run
+	url = git@github.com:installable-sh/run.git
+[submodule "install"]
+	path = install
+	url = git@github.com:installable-sh/install.git
