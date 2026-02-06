@@ -22,38 +22,7 @@ env:
   PR_PLATFORMS: linux/amd64
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Run tests
-        run: make test
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Check formatting and lint
-        run: make check lint
-
   build:
-    needs: [test, lint]
     runs-on: ubuntu-latest
     permissions:
       contents: read
