@@ -1,0 +1,45 @@
+name: Update Lib
+
+on:
+  workflow_call:
+    outputs:
+      changed:
+        description: "Whether the lib dependency was updated"
+        value: ${{ jobs.update-lib.outputs.changed }}
+
+jobs:
+  update-lib:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Update lib to latest v1
+        run: |
+          go get github.com/installable-sh/lib@v1
+          go mod tidy
+
+      - name: Commit changes
+        id: commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add go.mod go.sum
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "fix: weekly lib dependency update"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
