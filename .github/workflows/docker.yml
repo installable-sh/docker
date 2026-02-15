@@ -54,6 +54,15 @@ jobs:
             type=ref,event=branch
             type=sha
 
+      - name: Determine version
+        id: version
+        run: |
+          if [ -n "${{ inputs.new-tag }}" ]; then
+            echo "version=${{ inputs.new-tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=0.0.0-dev+$(echo ${{ github.sha }} | cut -c1-7)" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -62,5 +71,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ steps.version.outputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
